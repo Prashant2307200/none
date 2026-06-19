@@ -54,8 +54,15 @@ function Invoke-Setup {
         Write-Host "Created custom event log channel: $WinLogGenChannel"
     }
 
-    # --- Make sure normal-app sources exist for System/Application --------
-    foreach ($src in 'AppSimSvc') {
+    # --- Make sure all template sources exist for System/Application ------
+    $systemSources = 'Service Control Manager','Disk','Kernel-General'
+    $appSources    = 'Application Error','MsiInstaller','ESENT','AppSimSvc'
+    foreach ($src in $systemSources) {
+        if (-not [System.Diagnostics.EventLog]::SourceExists($src)) {
+            New-EventLog -LogName System -Source $src
+        }
+    }
+    foreach ($src in $appSources) {
         if (-not [System.Diagnostics.EventLog]::SourceExists($src)) {
             New-EventLog -LogName Application -Source $src
         }
