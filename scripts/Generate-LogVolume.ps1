@@ -79,7 +79,7 @@ function Invoke-Setup {
     if (-not (Get-LocalUser -Name $TestUser -ErrorAction SilentlyContinue)) {
         $pwd = ConvertTo-SecureString 'L0gSim-Temp!2024' -AsPlainText -Force
         New-LocalUser -Name $TestUser -Password $pwd -PasswordNeverExpires `
-            -Description "Disposable account for log-volume simulation. Do not use for anything real." | Out-Null
+            -Description "Disposable log-sim test account" | Out-Null
         Add-LocalGroupMember -Group 'Users' -Member $TestUser -ErrorAction SilentlyContinue
     }
     # Disable lockout machine-wide is intrusive; instead just keep the threshold
