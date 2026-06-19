@@ -47,12 +47,12 @@ function Invoke-Setup {
     New-Item -ItemType Directory -Force -Path $RootPath, $ArchivePath | Out-Null
 
     # --- Custom channel: WinLogGen -----------------------------------------
-    if (-not [System.Diagnostics.EventLog]::Exists($WinLogGenChannel)) {
-        New-EventLog -LogName $WinLogGenChannel -Source 'OrderService'
-        New-EventLog -LogName $WinLogGenChannel -Source 'PaymentGateway'
-        New-EventLog -LogName $WinLogGenChannel -Source 'ApiGateway'
-        Write-Host "Created custom event log channel: $WinLogGenChannel"
+    foreach ($src in 'OrderService','PaymentGateway','ApiGateway') {
+        if (-not [System.Diagnostics.EventLog]::SourceExists($src)) {
+            New-EventLog -LogName $WinLogGenChannel -Source $src
+        }
     }
+    Write-Host "Custom event log channel ready: $WinLogGenChannel"
 
     # --- Make sure all template sources exist for System/Application ------
     $systemSources = 'Service Control Manager','Disk','SystemSimClock'
