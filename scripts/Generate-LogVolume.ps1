@@ -55,7 +55,7 @@ function Invoke-Setup {
     }
 
     # --- Make sure all template sources exist for System/Application ------
-    $systemSources = 'Service Control Manager','Disk','Kernel-General'
+    $systemSources = 'Service Control Manager','Disk','SystemSimClock'
     $appSources    = 'Application Error','MsiInstaller','ESENT','AppSimSvc'
     foreach ($src in $systemSources) {
         if (-not [System.Diagnostics.EventLog]::SourceExists($src)) {
@@ -107,7 +107,7 @@ $Script:SystemTemplates = @(
     @{ Source='Disk'; Id=51; Type='Warning';
        Msg={ param($dev) "An error was detected on device \Device\Harddisk0\DR$dev during a paging operation." } ;
        Args={ @((0..3 | Get-Random)) } }
-    @{ Source='Kernel-General'; Id=16; Type='Information';
+    @{ Source='SystemSimClock'; Id=16; Type='Information';
        Msg={ param($delta) "The system time has changed to (Local) by $delta seconds from the previous time." } ;
        Args={ @((1..30 | Get-Random)) } }
 )
@@ -141,7 +141,7 @@ function Write-TemplatedEvent {
     $argv = & $Template.Args
     $message = & $Template.Msg @argv
     Write-EventLog -LogName $(if ($Template.Source -in 'OrderService','PaymentGateway','ApiGateway') { $WinLogGenChannel }
-                               elseif ($Template.Source -in 'Service Control Manager','Disk','Kernel-General') { 'System' }
+                               elseif ($Template.Source -in 'Service Control Manager','Disk','SystemSimClock') { 'System' }
                                else { 'Application' }) `
                     -Source $Template.Source -EventId $Template.Id -EntryType $Template.Type -Message $message
     return [System.Text.Encoding]::Unicode.GetByteCount($message) + 512   # + approx XML/header overhead
